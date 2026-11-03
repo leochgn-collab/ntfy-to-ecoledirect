@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block titre %}Paramètres · ntfy to EcoleDirecte{% endblock %}
+{% block contenu %}
+<h1>Paramètres</h1>
+<form method="post" class="carte pile">
+  <input type="hidden" name="csrf" value="{{ csrf() }}">
+  <input type="hidden" name="formulaire" value="ntfy">
+  <h2>Serveur ntfy</h2>
+  <label>Adresse du serveur <small>ex. https://ntfy.mondomaine.fr ou http://ntfy:80 si ntfy est dans le même Docker</small>
+    <input type="url" name="ntfy_serveur" value="{{ serveur }}" required spellcheck="false"></label>
+  <fieldset class="pile">
+    <legend>Authentification ntfy</legend>
+    <label class="case"><input type="radio" name="auth" value="aucune" {% if auth == 'aucune' %}checked{% endif %}> Aucune (serveur ouvert)</label>
+    <label class="case"><input type="radio" name="auth" value="jeton" {% if auth == 'jeton' %}checked{% endif %}> Jeton d'accès (tk_…)</label>
+    <label class="retrait">Jeton {% if a_jeton %}<small>un jeton est enregistré ; laisse vide pour le garder</small>{% endif %}
+      <input type="password" name="ntfy_jeton" autocomplete="off" maxlength="200"></label>
+    <label class="case"><input type="radio" name="auth" value="utilisateur" {% if auth == 'utilisateur' %}checked{% endif %}> Utilisateur et mot de passe</label>
+    <label class="retrait">Utilisateur <input name="ntfy_utilisateur" value="{{ utilisateur }}" autocomplete="off" maxlength="100"></label>
+    <label class="retrait">Mot de passe {% if a_mdp %}<small>enregistré ; laisse vide pour le garder</small>{% endif %}
+      <input type="password" name="ntfy_motdepasse" autocomplete="off" maxlength="200"></label>
+  </fieldset>
+  <h2>Surveillance</h2>
+  <div class="deux">
+    <label>Vérifier toutes les (minutes) <input type="number" name="verif_minutes" value="{{ verif }}" min="5" max="120" required></label>
+    <label>Surveiller l'emploi du temps sur (jours) <input type="number" name="jours_surveilles" value="{{ jours }}" min="1" max="30" required></label>
+  </div>
+  <div class="actions"><button class="bouton">Enregistrer</button></div>
+</form>
+
+<form method="post" class="carte pile">
+  <input type="hidden" name="csrf" value="{{ csrf() }}">
+  <input type="hidden" name="formulaire" value="mdp">
+  <h2>Mot de passe de l'interface</h2>
+  <label>Mot de passe actuel <input type="password" name="actuel" required autocomplete="current-password"></label>
+  <div class="deux">
+    <label>Nouveau <small>12 caractères minimum</small><input type="password" name="nouveau" required minlength="12" autocomplete="new-password"></label>
+    <label>Confirmation <input type="password" name="nouveau2" required minlength="12" autocomplete="new-password"></label>
+  </div>
+  <div class="actions"><button class="bouton second">Changer le mot de passe</button></div>
+</form>
+{% endblock %}

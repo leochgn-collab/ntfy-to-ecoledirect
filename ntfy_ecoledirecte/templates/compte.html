@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titre %}{{ 'Nouveau compte' if creation else c.nom }} · ntfy to EcoleDirecte{% endblock %}
+{% block contenu %}
+<h1>{{ 'Ajouter un compte' if creation else 'Modifier « ' ~ c.nom ~ ' »' }}</h1>
+<form method="post" class="pile">
+  <input type="hidden" name="csrf" value="{{ csrf() }}">
+  <section class="carte pile">
+    <h2>Compte EcoleDirecte</h2>
+    <label>Nom affiché <small>pour t'y retrouver, ex. « Alex » ou « Compte de Sam »</small>
+      <input name="nom" value="{{ c.nom }}" required maxlength="60"></label>
+    <label>Identifiant EcoleDirecte <input name="identifiant" value="{{ c.identifiant }}" required maxlength="100" autocomplete="off" spellcheck="false"></label>
+    <label>Mot de passe EcoleDirecte
+      {% if not creation %}<small>laisse vide pour garder l'actuel</small>{% endif %}
+      <input type="password" name="motdepasse" {% if creation %}required{% endif %} maxlength="200" autocomplete="new-password"></label>
+    {% set eleves = c.etat.get('eleves') or [] %}
+    {% if eleves | length > 1 %}
+    <label>Élève à surveiller (compte parent)
+      <select name="eleve_id">
+        {% for el in eleves %}<option value="{{ el.id }}" {% if c.config.eleve_id == el.id %}selected{% endif %}>{{ el.prenom or ('Élève ' ~ el.id) }}</option>{% endfor %}
+      </select>
+      <small>Pour suivre plusieurs enfants, ajoute le compte une fois par enfant.</small></label>
+    {% endif %}
+    <label class="case"><input type="checkbox" name="actif" {% if c.actif %}checked{% endif %}> Surveillance active</label>
+  </section>
+
+  <section class="carte pile">
+    <h2>Topics ntfy</h2>
+    <p class="discret">Lettres, chiffres, <code>-</code> et <code>_</code>. Laisse vide pour ne pas recevoir ce type de notification.</p>
+    <label>Topic des changements <small>prof absent, salle, notes, devoirs, contrôles, messages…</small>
+      <input name="topic_changements" value="{{ c.config.topic_changements }}" pattern="[A-Za-z0-9_\-]{1,64}" maxlength="64" spellcheck="false"></label>
+    <label>Topic des rappels <small>avant chaque cours : matière, salle, prof</small>
+      <input name="topic_rappels" value="{{ c.config.topic_rappels }}" pattern="[A-Za-z0-9_\-]{1,64}" maxlength="64" spellcheck="false"></label>
+    <label>Rappel combien de minutes avant le cours ?
+      <input type="number" name="minutes_avant" value="{{ c.config.minutes_avant }}" min="1" max="60" required></label>
+  </section>
+
+  <section class="carte pile">
+    <h2>Que surveiller ?</h2>
+    {% for cle, libelle in categories.items() %}
+    <label class="case"><input type="checkbox" name="cat_{{ cle }}" {% if c.config.categories.get(cle) %}checked{% endif %}> {{ libelle }}</label>
+    {% endfor %}
+    <p class="discret">Seules les nouveautés sont envoyées : rien pour ce qui existait déjà à l'ajout du compte.</p>
+  </section>
+
+  <div class="actions">
+    <button class="bouton">{{ 'Ajouter le compte' if creation else 'Enregistrer' }}</button>
+    <a class="bouton second" href="{{ url_for('tableau') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

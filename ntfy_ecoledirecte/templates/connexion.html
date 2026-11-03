@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titre %}Connexion · ntfy to EcoleDirecte{% endblock %}
+{% block contenu %}
+<section class="carte etroite">
+  <h1>Connexion</h1>
+  <form method="post" class="pile">
+    <input type="hidden" name="csrf" value="{{ csrf() }}">
+    <label>Mot de passe <input type="password" name="mdp" required autofocus autocomplete="current-password"></label>
+    <button class="bouton">Se connecter</button>
+  </form>
+</section>
+{% endblock %}

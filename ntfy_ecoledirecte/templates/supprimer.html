@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block contenu %}
+<section class="carte etroite">
+  <h1>Supprimer « {{ c.nom }} » ?</h1>
+  <p>Le compte, son mot de passe chiffré et son historique seront effacés. Les notifications s'arrêtent tout de suite.</p>
+  <form method="post" class="actions">
+    <input type="hidden" name="csrf" value="{{ csrf() }}">
+    <button class="bouton danger-plein">Supprimer définitivement</button>
+    <a class="bouton second" href="{{ url_for('tableau') }}">Annuler</a>
+  </form>
+</section>
+{% endblock %}

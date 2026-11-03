@@ -1,0 +1,6 @@
+# Versions figées ; Dependabot propose les mises à jour de sécurité.
+Flask==3.1.0
+waitress==3.0.2
+requests==2.32.3
+cryptography==44.0.0
+tzdata==2024.2

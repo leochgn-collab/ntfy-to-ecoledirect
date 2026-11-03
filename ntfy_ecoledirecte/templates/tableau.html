@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block contenu %}
+<div class="titre-ligne">
+  <h1>Comptes EcoleDirecte</h1>
+  <a class="bouton" href="{{ url_for('nouveau_compte') }}">Ajouter un compte</a>
+</div>
+{% if not ntfy_ok %}
+<p class="flash info">Commence par indiquer ton serveur ntfy dans <a href="{{ url_for('parametres') }}">Paramètres</a>.</p>
+{% endif %}
+{% if not comptes %}
+<section class="carte vide">
+  <h2>Aucun compte pour l'instant</h2>
+  <p class="discret">Ajoute un compte EcoleDirecte et choisis les topics ntfy où arrivent ses notifications. Tu peux en ajouter autant que tu veux (frères et sœurs, plusieurs élèves…).</p>
+</section>
+{% endif %}
+<div class="liste">
+{% for c in comptes %}
+  {% set e = c.etat %}
+  <article class="carte compte" id="c{{ c.id }}">
+    <div class="compte-tete">
+      <div>
+        <h2>{{ c.nom }}</h2>
+        <p class="discret">{{ c.identifiant }}</p>
+      </div>
+      {% if not c.actif %}<span class="pastille gris">En pause</span>
+      {% elif c.statut == 'ok' %}<span class="pastille vert">Actif</span>
+      {% elif c.statut == 'partiel' %}<span class="pastille orange">Partiel</span>
+      {% elif c.statut == 'question' %}<span class="pastille orange">Question de sécurité</span>
+      {% elif c.statut == 'erreur' %}<span class="pastille rouge">Erreur</span>
+      {% else %}<span class="pastille gris">En attente</span>{% endif %}
+    </div>
+    {% if c.message %}<p class="alerte">{{ c.message }}</p>{% endif %}
+    {% if c.statut == 'question' and c.actif %}
+      <p><a class="bouton" href="{{ url_for('securite', ident=c.id) }}">Répondre à la question de sécurité</a></p>
+    {% endif %}
+    <dl class="infos">
+      <div><dt>Changements</dt><dd>{% if c.config.topic_changements %}<code>{{ c.config.topic_changements }}</code>{% else %}désactivé{% endif %}</dd></div>
+      <div><dt>Rappels</dt><dd>{% if c.config.topic_rappels %}<code>{{ c.config.topic_rappels }}</code> · {{ c.config.minutes_avant }} min avant{% else %}désactivés{% endif %}</dd></div>
+      <div><dt>Dernière vérification</dt><dd>{{ e.get('derniere_verif') | depuis }}</dd></div>
+      <div><dt>Suivi</dt><dd>{{ e.get('cours', {}) | length }} cours · {{ e.get('vus', {}).get('notes', []) | length }} notes · {{ e.get('vus', {}).get('devoirs', []) | length }} devoirs</dd></div>
+    </dl>
+    <div class="actions">
+      <a class="bouton second" href="{{ url_for('modifier_compte', ident=c.id) }}">Modifier</a>
+      <form method="post" action="{{ url_for('tester_compte', ident=c.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="bouton second">Tester ntfy</button></form>
+      {% if c.actif and c.statut != 'question' %}
+      <form method="post" action="{{ url_for('verifier_compte', ident=c.id) }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="bouton second">Vérifier maintenant</button></form>
+      {% endif %}
+      <a class="bouton danger" href="{{ url_for('supprimer_compte', ident=c.id) }}">Supprimer</a>
+    </div>
+  </article>
+{% endfor %}
+</div>
+{% endblock %}

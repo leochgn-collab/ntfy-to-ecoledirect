@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+data/
+*.db
+*.db-wal
+*.db-shm
+cle-chiffrement
+cle-sessions
+.env
+.venv/

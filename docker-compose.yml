@@ -1,0 +1,34 @@
+services:
+  ntfy-to-ecoledirecte:
+    image: ghcr.io/leochgn-collab/ntfy-to-ecoledirect:latest
+    # Pour construire l'image toi-même à la place : docker compose build
+    build: .
+    container_name: ntfy-to-ecoledirecte
+    restart: unless-stopped
+    # Interface accessible uniquement depuis la machine elle-même.
+    # Pour y accéder ailleurs, passe par un reverse proxy HTTPS (voir README), pas en ouvrant ce port.
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - donnees:/data
+    environment:
+      TZ: Europe/Paris
+      # "false" uniquement en accès local en http://127.0.0.1:8080.
+      # Derrière un reverse proxy HTTPS : COOKIE_SECURE=true et TRUST_PROXY=true.
+      COOKIE_SECURE: "false"
+      TRUST_PROXY: "false"
+      # Clé de chiffrement des mots de passe (recommandé) : voir README.
+      # NTFY_ED_CLE: ${NTFY_ED_CLE}
+    # Durcissement du conteneur
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    pids_limit: 128
+
+volumes:
+  donnees:

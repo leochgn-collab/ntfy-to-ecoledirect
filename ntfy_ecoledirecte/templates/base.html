@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{% block titre %}ntfy to EcoleDirecte{% endblock %}</title>
+<link rel="icon" href="{{ url_for('static', filename='icone.svg') }}" type="image/svg+xml">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="haut">
+  <div class="enveloppe haut-ligne">
+    <a class="marque" href="{{ url_for('tableau') }}"><span class="logo" aria-hidden="true"></span>ntfy <em>to</em> EcoleDirecte</a>
+    {% if session.get('ok') %}
+    <nav class="menu">
+      <a href="{{ url_for('tableau') }}">Comptes</a>
+      <a href="{{ url_for('parametres') }}">Paramètres</a>
+      <form method="post" action="{{ url_for('deconnexion') }}"><input type="hidden" name="csrf" value="{{ csrf() }}"><button class="lien">Déconnexion</button></form>
+    </nav>
+    {% endif %}
+  </div>
+</header>
+<main class="enveloppe">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% for cat, m in messages %}<p class="flash {{ cat }}" role="status">{{ m }}</p>{% endfor %}
+  {% endwith %}
+  {% block contenu %}{% endblock %}
+</main>
+</body>
+</html>
