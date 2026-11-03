@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 import requests
 
 from . import notifications
+from . import demo
 from .ecoledirecte import ErreurEcoleDirecte, QuestionSecuriteRequise, Session, annee_scolaire
 
 log = logging.getLogger(__name__)
@@ -152,8 +153,9 @@ class Surveillant:
             self.etat.setdefault(cle, defaut)
         self.envoyer = envoyer          # envoyer(topic, titre, message, tags, priorite)
         sec = compte.get("secrets") or {}
-        self.session = Session(compte["identifiant"], sec.get("motdepasse", ""), fa=sec.get("fa"),
-                               eleve_choisi=self.config.get("eleve_id") or None)
+        fabrique = demo.SessionDemo if demo.est_demo(compte["identifiant"]) else Session
+        self.session = fabrique(compte["identifiant"], sec.get("motdepasse", ""), fa=sec.get("fa"),
+                                eleve_choisi=self.config.get("eleve_id") or None)
         self.prochaine = 0.0
 
     def _changement(self, alerte):
@@ -291,12 +293,14 @@ class Moteur:
                     self._tour()
             except Exception:  # la boucle ne doit jamais s'arrêter
                 log.exception("erreur inattendue dans la surveillance")
-            self.reveil.wait(30)
+            self.reveil.wait(min(30, demo.PAS) if demo.ACTIF else 30)
             self.reveil.clear()
 
     def _tour(self):
         self._synchroniser()
         intervalle = max(5, int(self.stockage.reglage("verif_minutes") or 10)) * 60
+        if demo.ACTIF:
+            intervalle = demo.PAS  # démo : une vérification à chaque étape
         for s in list(self.surveillants.values()):
             if time.time() >= s.prochaine:
                 self._verifier(s, intervalle)

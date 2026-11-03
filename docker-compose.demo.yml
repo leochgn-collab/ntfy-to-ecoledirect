@@ -1,0 +1,32 @@
+# Démo complète, sans compte EcoleDirecte : un serveur ntfy + le service en mode « école simulée ».
+#   docker compose -f docker-compose.demo.yml up -d --build
+#   docker compose -f docker-compose.demo.yml logs ntfy-to-ecoledirecte | grep "code d'installation"
+# Interface : http://127.0.0.1:8080   ·   Notifications : http://127.0.0.1:8090/demo-changements
+services:
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    command: serve
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:80"
+
+  ntfy-to-ecoledirecte:
+    build: .
+    restart: unless-stopped
+    depends_on: [ntfy]
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - demo-donnees:/data
+    environment:
+      TZ: Europe/Paris
+      COOKIE_SECURE: "false"
+      NTFY_ED_DEMO: "true"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+volumes:
+  demo-donnees:

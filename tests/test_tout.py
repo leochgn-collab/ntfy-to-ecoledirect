@@ -241,3 +241,31 @@ class TestWeb(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestDemo(unittest.TestCase):
+    def test_ecole_simulee_progresse(self):
+        from ntfy_ecoledirecte import demo
+        with mock.patch.object(demo, "ACTIF", True), mock.patch.object(demo.time, "time", return_value=1000.0):
+            self.assertTrue(demo.est_demo("Demo"))
+            s = demo.SessionDemo("demo-test-progression")
+            self.assertEqual(len(s.notes()), 1)
+        with mock.patch.object(demo.time, "time", return_value=1000.0 + 6 * demo.PAS):
+            self.assertEqual(len(s.notes()), 2)
+            self.assertTrue(any(c["annule"] for c in s.emploi_du_temps("", "").values()))
+            self.assertTrue(s.vie_scolaire())
+
+    def test_demo_desactivee_par_defaut(self):
+        from ntfy_ecoledirecte import demo
+        with mock.patch.object(demo, "ACTIF", False):
+            self.assertFalse(demo.est_demo("demo"))
+
+
+class TestDemoRappel(unittest.TestCase):
+    def test_rappel_part_une_minute_apres_l_ajout(self):
+        from ntfy_ecoledirecte import demo
+        with mock.patch.object(demo, "_maintenant", return_value=INSTANT):
+            cours = demo.SessionDemo("demo-test-rappel").emploi_du_temps("", "")
+        self.assertEqual(S.rappels_a_envoyer(cours, set(), 5, INSTANT), [])
+        rappels = S.rappels_a_envoyer(cours, set(), 5, INSTANT + dt.timedelta(minutes=1))
+        self.assertEqual([c["matiere"] for _, c in rappels], ["Mathématiques"])
