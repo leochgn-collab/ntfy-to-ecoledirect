@@ -13,7 +13,6 @@ from functools import wraps
 from flask import Flask, abort, flash, redirect, render_template, request, session, url_for
 
 from . import notifications
-from . import demo
 from .ecoledirecte import ErreurEcoleDirecte, Session
 from .securite import cle_sessions, empreinte_mdp, mdp_assez_fort, verifier_mdp
 from .stockage import CATEGORIES, CONFIG_DEFAUT
@@ -100,7 +99,6 @@ def creer_app(stockage, moteur) -> Flask:
         return session["csrf"]
 
     app.jinja_env.globals["csrf"] = jeton_csrf
-    app.jinja_env.globals["mode_demo"] = demo.ACTIF
 
     @app.before_request
     def verifier_csrf():
@@ -339,8 +337,7 @@ def creer_app(stockage, moteur) -> Flask:
             flash("Réponse acceptée : la surveillance reprend.", "ok")
             return redirect(url_for("tableau", _anchor=f"c{ident}"))
 
-        s = (demo.SessionDemo if demo.est_demo(c["identifiant"]) else Session)(
-            c["identifiant"], c["secrets"].get("motdepasse", ""))
+        s = Session(c["identifiant"], c["secrets"].get("motdepasse", ""))
         try:
             question, propositions = s.question_securite()
         except ErreurEcoleDirecte as e:

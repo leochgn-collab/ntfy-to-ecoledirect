@@ -22,7 +22,6 @@
   </div>
 </header>
 <main class="enveloppe">
-  {% if mode_demo %}<p class="flash info"><strong>Mode démo actif.</strong> Ajoute un compte avec l'identifiant <code>demo</code> (n'importe quel mot de passe) : une école simulée envoie un événement par minute. <code>demo-question</code> teste la question de sécurité.</p>{% endif %}
   {% with messages = get_flashed_messages(with_categories=true) %}
   {% for cat, m in messages %}<p class="flash {{ cat }}" role="status">{{ m }}</p>{% endfor %}
   {% endwith %}

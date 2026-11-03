@@ -9,26 +9,6 @@ Reçois sur ton téléphone, via [ntfy](https://ntfy.sh), ce qui change sur **Ec
 
 > Projet indépendant, sans lien avec EcoleDirecte / Aplim. EcoleDirecte n'a pas d'API publique : le service utilise la même interface que le site web et peut cesser de fonctionner si elle change.
 
-## Essayer la démo (sans compte EcoleDirecte)
-
-Une école simulée et un serveur ntfy, tout compris :
-
-```bash
-git clone https://github.com/leochgn-collab/ntfy-to-ecoledirect.git
-cd ntfy-to-ecoledirect
-docker compose -f docker-compose.demo.yml up -d --build
-docker compose -f docker-compose.demo.yml logs ntfy-to-ecoledirecte | grep "code d'installation"
-```
-
-1. Ouvre **http://127.0.0.1:8080**, saisis le code d'installation et choisis un mot de passe.
-2. **Paramètres** › serveur ntfy : `http://ntfy:80`.
-3. **Ajouter un compte** : identifiant `demo`, n'importe quel mot de passe, topics `demo-changements` et `demo-rappels`.
-4. Ouvre **http://127.0.0.1:8090/demo-changements** et **http://127.0.0.1:8090/demo-rappels** dans deux onglets (ou abonne-toi depuis l'app ntfy).
-
-Pendant les minutes qui suivent arrivent : un rappel avant un cours, un changement de salle, un prof absent, une note, un contrôle, un message et un retard. L'identifiant `demo-question` permet d'essayer la question de sécurité (réponse : « Mars »). Le mode démo ne s'active qu'avec `NTFY_ED_DEMO=true`.
-
-Pour arrêter et tout effacer : `docker compose -f docker-compose.demo.yml down -v`.
-
 ## Démarrage rapide
 
 ```bash
@@ -91,8 +71,6 @@ TRUST_PROXY: "true"   # seulement si le proxy est le seul à pouvoir joindre le 
 | `TZ` | `Europe/Paris` | fuseau horaire des cours |
 | `PORT` | `8080` | port interne |
 | `LOG_LEVEL` | `INFO` | niveau des journaux |
-| `NTFY_ED_DEMO` | `false` | active l'école simulée (comptes `demo` et `demo-question`) |
-| `NTFY_ED_DEMO_PAS` | `60` | durée d'une étape de la démo, en secondes |
 
 ## Sécurité
 
